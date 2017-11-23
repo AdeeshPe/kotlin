@@ -29,6 +29,8 @@ import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.refactoring.inline.KotlinInlineValHandler
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
+import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.getNextSiblingIgnoringWhitespaceAndComments
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.resolve.BindingContext.DECLARATION_TO_DESCRIPTOR
@@ -73,7 +75,21 @@ class UnnecessaryVariableInspection : AbstractKotlinInspection() {
                     val initializerDescriptor = context[REFERENCE_TARGET, initializer] as? VariableDescriptor ?: return false
                     if (initializerDescriptor.isVar) return false
                     if (initializerDescriptor.containingDeclaration !is FunctionDescriptor) return false
-                    return ReferencesSearch.search(property, LocalSearchScope(enclosingElement)).findFirst() != null
+
+                    val copyName = initializerDescriptor.name.asString()
+                    if (copyName == "it") return false
+                    if (ReferencesSearch.search(property, LocalSearchScope(enclosingElement)).findFirst() == null) return false
+
+                    var sibling = property.getNextSiblingIgnoringWhitespaceAndComments()
+                    while (sibling != null) {
+                        if (sibling.anyDescendantOfType<KtCallableDeclaration> {
+                            it !is KtFunction && it.name == copyName
+                        }) {
+                            return false
+                        }
+                        sibling = sibling.getNextSiblingIgnoringWhitespaceAndComments()
+                    }
+                    return true
                 }
                 return false
             }
