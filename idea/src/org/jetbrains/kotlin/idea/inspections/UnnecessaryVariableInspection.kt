@@ -27,14 +27,13 @@ import com.intellij.psi.search.searches.ReferencesSearch
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
+import org.jetbrains.kotlin.idea.core.NewDeclarationNameValidator
 import org.jetbrains.kotlin.idea.refactoring.inline.KotlinInlineValHandler
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
-import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
-import org.jetbrains.kotlin.psi.psiUtil.getNextSiblingIgnoringWhitespaceAndComments
-import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
+import org.jetbrains.kotlin.psi.psiUtil.*
 import org.jetbrains.kotlin.resolve.BindingContext.DECLARATION_TO_DESCRIPTOR
 import org.jetbrains.kotlin.resolve.BindingContext.REFERENCE_TARGET
+import org.jetbrains.kotlin.resolve.DescriptorToSourceUtils
 
 class UnnecessaryVariableInspection : AbstractKotlinInspection() {
 
@@ -77,17 +76,19 @@ class UnnecessaryVariableInspection : AbstractKotlinInspection() {
                     if (initializerDescriptor.containingDeclaration !is FunctionDescriptor) return false
 
                     val copyName = initializerDescriptor.name.asString()
-                    if (copyName == "it") return false
                     if (ReferencesSearch.search(property, LocalSearchScope(enclosingElement)).findFirst() == null) return false
 
-                    var sibling = property.getNextSiblingIgnoringWhitespaceAndComments()
-                    while (sibling != null) {
-                        if (sibling.anyDescendantOfType<KtCallableDeclaration> {
-                            it !is KtFunction && it.name == copyName
-                        }) {
-                            return false
-                        }
-                        sibling = sibling.getNextSiblingIgnoringWhitespaceAndComments()
+                    val containingDeclaration = property.getStrictParentOfType<KtDeclaration>()
+                    if (containingDeclaration != null) {
+                        val validator = NewDeclarationNameValidator(
+                                container = containingDeclaration,
+                                anchor = property,
+                                target = NewDeclarationNameValidator.Target.VARIABLES,
+                                excludedDeclarations = listOfNotNull(
+                                        DescriptorToSourceUtils.descriptorToDeclaration(initializerDescriptor) as? KtDeclaration
+                                )
+                        )
+                        if (!validator(copyName)) return false
                     }
                     return true
                 }
