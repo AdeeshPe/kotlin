@@ -3,7 +3,7 @@
 // CHOOSE_BEAN: barBean
 package a
 
-open class FooBean(barBean: BarBean) {
+open class FooBean(barBean1: BarBean) {
 }
 
 open class BarBean

@@ -4,7 +4,7 @@
 package a
 
 open class FooBean(n: Int) {
-    constructor(barBean: BarBean, bazBean: BazBean): this(1)
+    constructor(barBean: BarBean, bazBean1: BazBean): this(1)
 }
 
 open class BarBean
