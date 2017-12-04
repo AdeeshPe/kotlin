@@ -15827,9 +15827,21 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             doTest(fileName);
         }
 
-        @TestMetadata("forInArrayWithArrayVarUpdatedInLoopBody.kt")
-        public void testForInArrayWithArrayVarUpdatedInLoopBody() throws Exception {
-            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/ranges/forInArrayWithArrayVarUpdatedInLoopBody.kt");
+        @TestMetadata("forInArrayWithArrayVarUpdatedInLoopBody12.kt")
+        public void testForInArrayWithArrayVarUpdatedInLoopBody12() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/ranges/forInArrayWithArrayVarUpdatedInLoopBody12.kt");
+            try {
+                doTest(fileName);
+            }
+            catch (Throwable ignore) {
+                return;
+            }
+            throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
+        }
+
+        @TestMetadata("forInArrayWithArrayVarUpdatedInLoopBody13.kt")
+        public void testForInArrayWithArrayVarUpdatedInLoopBody13() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/ranges/forInArrayWithArrayVarUpdatedInLoopBody13.kt");
             try {
                 doTest(fileName);
             }

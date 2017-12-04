@@ -1,4 +1,5 @@
 // WITH_RUNTIME
+// LANGUAGE_VERSION: 1.3
 // IGNORE_BACKEND: JS
 
 // In Kotlin 1.0, in a for-in-array loop, range expression is cached in
@@ -19,5 +20,5 @@ fun box(): String {
         sum = sum * 10 + x
         xs = intArrayOf(4, 5)
     }
-    return if (sum == 15) "OK" else "Fail: $sum"
+    return if (sum == 123) "OK" else "Fail: $sum"
 }
